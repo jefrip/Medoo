@@ -29,8 +29,22 @@ Get Started
 // Include Medoo
 require_once 'medoo.php';
 
+$config = array(
+	'type' => 'mysql',
+	'name' => 'mydb',
+	'server' => 'localhost',
+	'username' => 'username',
+	'password' => 'password'
+);
+
+//optional
+$options = array(
+    PDO::ATTR_PERSISTENT => true //if using persistent connection
+);
+
 // Initialize
-$database = new medoo('my_database');
+$database = new medoo($config, $options);
+
 
 // Enjoy
 $database->insert('account', [

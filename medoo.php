@@ -9,48 +9,43 @@
  */
 class medoo
 {
-	protected $database_type = 'mysql';
-
-	// For MySQL, MSSQL, Sybase
-	protected $server = 'localhost';
-	
-	protected $username = 'username';
-	
-	protected $password = 'password';
-
 	// Optional
 	protected $charset = 'utf8';
 	
-	public function __construct($database_name)
+	public function __construct($config, $options = array())
 	{
 		try {
-			$type = strtolower($this->database_type);
+			$type = strtolower($config['type']);
 			switch ($type)
 			{
 				case 'mysql':
 				case 'pgsql':
 					$this->pdo = new PDO(
-						$type . ':host=' . $this->server . ';dbname=' . $database_name, 
-						$this->username,
-						$this->password
+						$type . ':host=' . $$config['server'] . ';dbname=' . $config['name'], 
+						$config['username'],
+						$config['password'],
+						$options
 					);
 					break;
 
 				case 'mssql':
 				case 'sybase':
 					$this->pdo = new PDO(
-						$type . ':host=' . $this->server . ';dbname=' . $database_name . ',' .
-						$this->username . ',' .
-						$this->password
+						$type . ':host=' . $config['server'] . ';dbname=' . $config['name'] . ',' .
+						$config['username'] . ',' .
+						$config['password'],
+						$options
 					);
 					break;
 
 				case 'sqlite':
 					$this->pdo = new PDO(
-						$type . ':' . $database_name
+						$type . ':' . $config['name'],
+						$options
 					);
 					break;
 			}
+			$this->pdo->setAttribute(PDO::ATTR_CASE, PDO::CASE_NATURAL);//ensure the column names returned from a query http://www.php.net/manual/en/pdo.setattribute.php#75221
 			$this->pdo->exec('SET NAMES \'' . $this->charset . '\'');
 		}
 		catch (PDOException $e) {
